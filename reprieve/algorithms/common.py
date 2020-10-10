@@ -15,7 +15,7 @@ def cross_entropy(logits, label):
 def mse(pred, target):
     return ((pred - target)**2).mean()
 
-def loss_fn(model, batch, fn=cross_entropy):
+def loss_fn(model, batch, fn=mse):
     preds = model(batch[0])
     loss = jnp.mean(fn(preds, batch[1]))
     return loss
