@@ -11,10 +11,14 @@ def batch_to_jax(batch):
 def cross_entropy(logits, label):
     return -logits[label]
 
+@jax.vmap
+def mse(pred, target):
+    return ((pred - target)**2).mean()
 
-def loss_fn(model, batch):
-    logits = model(batch[0])
-    loss = jnp.mean(cross_entropy(logits, batch[1]))
+def loss_fn(model, batch, fn=cross_entropy):
+    preds = model(batch[0])
+    loss = jnp.mean(fn(preds, batch[1]))
     return loss
+
 grad_loss_fn = jax.grad(loss_fn)  # noqa: E305
 loss_and_grad_fn = jax.value_and_grad(loss_fn)
