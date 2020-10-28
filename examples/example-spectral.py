@@ -15,12 +15,13 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-import os,sys,inspect
+import os, sys, inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-targetdir = os.path.dirname(currentdir)+'/reprieve'
-sys.path.insert(0,targetdir)
-import utils
+targetdir = os.path.dirname(currentdir) + '/reprieve'
+sys.path.insert(0, targetdir)
+
 import dataset_wrappers
+import utils
 
 class SpectralDataset(Dataset):
     """Dataset with different frequencies."""
@@ -89,24 +90,15 @@ if __name__ == '__main__':
         loss_data_estimator = reprieve.LossDataEstimator(
             init_fn, train_step_fn, eval_fn, dataset_spectral)
 
-        # Use _train_full_vmap to get a trained model state
+        # Use _train
         train_set = dataset_wrappers.DatasetSubset(
             dataset_spectral, stop=int(0.9*len(dataset_spectral)))
+        state = loss_data_estimator._train(seed=11, dataset=train_set)
         train_set = utils.dataset_to_jax(
             train_set,
             batch_transforms=[lambda x: x],
             batch_size=batch_size)
-        multi_iterator = utils.jax_multi_iterator(
-            train_set, batch_size, product_seeds, product_points)
-        states = loss_data_estimator._train_full_vmap(multi_iterator, product_seeds)
-        model = states.target
-
-        # Get predictions
-        for batch in multi_iterator:
-            import ipdb; ipdb.set_trace()
-            preds = model(batch[0])
-            # *** ValueError: Existing shape (1, 1, 10) differs from requested shape (256, 10)
-
+        preds = state.target(train_set[0])
 
         results = loss_data_estimator.compute_curve()
         # name experiments
