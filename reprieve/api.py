@@ -287,6 +287,22 @@ class LossDataEstimator:
                     break
         return state
 
+    def _train_full(self, seed, dataset):
+        """Performs training with the algorithm associated with this LDE.
+        Runs `self.train_steps` epochs over training set and
+        returns the state.
+        """
+        torch.manual_seed(seed)
+        loader = self._make_loader(dataset, shuffle=True)
+        state = self.init_fn(seed)
+        for step in range(self.train_steps):
+            for batch in loader:
+                xs, ys = utils.batch_to_numpy(batch)
+                xs = utils.apply_transforms(
+                    self.batch_transforms, xs)
+                state, loss = self.train_step_fn(state, (xs, ys))
+        return state
+
     def _eval(self, state, dataset):
         """Evaluates the model specified by state on dataset.
         Computes the average loss by summing the total loss over all datapoints

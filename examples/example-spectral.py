@@ -93,7 +93,7 @@ if __name__ == '__main__':
         # Use _train
         train_set = dataset_wrappers.DatasetSubset(
             dataset_spectral, stop=int(0.9*len(dataset_spectral)))
-        state = loss_data_estimator._train(seed=11, dataset=train_set)
+        state = loss_data_estimator._train_full(seed=11, dataset=train_set)
         train_set = utils.dataset_to_jax(
             train_set,
             batch_transforms=[lambda x: x],
