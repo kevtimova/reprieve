@@ -2,8 +2,11 @@ import torch
 from torch.utils.data import Dataset
 
 import numpy as np
-
-from . import utils
+import os, sys, inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+targetdir = os.path.dirname(currentdir) + '/reprieve'
+sys.path.insert(0, targetdir)
+import utils
 
 
 class DatasetWrapper(Dataset):
