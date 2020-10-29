@@ -18,7 +18,7 @@ class MLPClassifier(nn.Module):
         return preds
 
 
-def make_algorithm(input_shape, n_classes, n_layers=2, h_dim=512):
+def make_algorithm(input_shape, n_classes, n_layers=2, h_dim=512, lr=1e-4):
     def init_fn(seed):
         rng = random.PRNGKey(seed)
         classifier = MLPClassifier.partial(hidden_layers=n_layers,
@@ -26,7 +26,7 @@ def make_algorithm(input_shape, n_classes, n_layers=2, h_dim=512):
                                            n_classes=n_classes)
         _, initial_params = classifier.init_by_shape(rng, [(128, *input_shape)])
         initial_model = nn.Model(classifier, initial_params)
-        optimizer = optim.Adam(1e-4).create(initial_model)
+        optimizer = optim.Adam(lr).create(initial_model)
         return optimizer
 
     @jax.jit
