@@ -15,7 +15,7 @@ class LossDataEstimator:
     def __init__(self, init_fn, train_step_fn, eval_fn, dataset,
                  representation_fn=lambda x: x,
                  val_frac=0.1, n_seeds=5,
-                 train_steps=4e3, batch_size=256,
+                 train_steps=4e3, batch_size=256, epochs = 30,
                  cache_data=True, whiten=True,
                  use_vmap=True, verbose=False):
         """Create a LossDataEstimator.
@@ -69,6 +69,7 @@ class LossDataEstimator:
         self.n_seeds = n_seeds
         self.train_steps = int(train_steps)
         self.batch_size = batch_size
+        self.epochs = epochs
         self.use_vmap = use_vmap
         self.verbose = verbose
         if self.verbose:
@@ -295,7 +296,7 @@ class LossDataEstimator:
         torch.manual_seed(seed)
         loader = self._make_loader(dataset, shuffle=True)
         state = self.init_fn(seed)
-        for step in range(self.train_steps):
+        for step in range(self.epochs):
             for batch in loader:
                 xs, ys = utils.batch_to_numpy(batch)
                 xs = utils.apply_transforms(
